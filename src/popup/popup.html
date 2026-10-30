@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tenebra</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <span class="glyph" aria-hidden="true">◐</span>
+      <h1>Tenebra</h1>
+    </header>
+
+    <section class="site">
+      <p class="site-host" id="site-host">this site</p>
+      <div class="segmented" role="radiogroup" aria-label="Dark mode for this site">
+        <button type="button" data-mode="always" id="mode-always">Always</button>
+        <button type="button" data-mode="default" id="mode-default">Auto</button>
+        <button type="button" data-mode="never" id="mode-never">Never</button>
+      </div>
+    </section>
+
+    <section class="global">
+      <label class="switch-row">
+        <span>Dark mode by default</span>
+        <input type="checkbox" id="global-toggle" />
+      </label>
+    </section>
+
+    <section class="debug">
+      <label class="switch-row">
+        <span>Debug mode</span>
+        <input type="checkbox" id="debug-toggle" />
+      </label>
+      <pre class="debug-info" id="debug-info" hidden></pre>
+    </section>
+
+    <footer>
+      <a href="../options/options.html" target="_blank" rel="noopener">Options</a>
+      <span class="privacy-note">No data leaves your device.</span>
+    </footer>
+
+    <script src="../shared/storage.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
