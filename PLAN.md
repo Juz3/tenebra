@@ -184,12 +184,10 @@ tenebra/
    plus generated 16/32/48/96/128px PNGs (`npm run generate-icons`).
 7. ✅ **Build/package tooling** (`build.js`, `web-ext`, npm scripts).
 8. ✅ **CI** (GitHub Actions: lint, test, build artifacts on PR) - workflow
-   exists at `.github/workflows/ci.yml` and its full step sequence
-   (install, lint, test, generate-icons, build, web-ext lint, package
-   Chrome, package Firefox) has been verified to pass locally end-to-end
-   (2026-09-29). Not yet actually exercised on GitHub Actions itself,
-   since there is still no remote/public repo to push to (Section 8,
-   Phase 1) - that will be the first real CI run, at Phase 3.
+   exists at `.github/workflows/ci.yml`; its full step sequence (install,
+   lint, test, generate-icons, build, web-ext lint, package Chrome,
+   package Firefox) passes locally end-to-end. Confirm it is green on
+   GitHub Actions (see milestone 11).
 9. **Manual test pass** across a handful of representative sites (a plain
    content site, a site with native dark mode, a media-heavy site, an
    already-dark site) in Firefox, Chrome, and at least one Chromium-based
@@ -198,207 +196,101 @@ tenebra/
    progress**: Firefox and Chrome have been manually tested and iterated
    on extensively (see Section 10); Edge/Brave/Opera and the wider site
    matrix (media-heavy, LinkedIn re-test) are still pending.
-10. **Pre-publish local development phase** - build out the MVP fully
-    on the local-only git repo (Section 8) before any public exposure.
-11. **Transition to public GitHub repo** with cleanup pass (Section 8).
-    **In progress** (2026-09-29): pre-publish cleanup checklist underway
-    - see Section 8's updated status markers.
+10. ✅ **Pre-publish local development phase** - MVP built out on a
+    local-only git repo before any public exposure.
+11. ✅ **Transition to public GitHub repo** - history squashed to a single
+    commit and merged to `main` (see Section 8). Remaining publish steps:
+    - Tag `v0.1.0`.
+    - Confirm CI is green on GitHub Actions (first real run).
+    - Replace the placeholder Firefox gecko ID (`tenebra@example.invalid`)
+      with the real add-on ID before AMO submission.
 12. **Store listings**: AMO, Chrome Web Store, and (optionally) Edge
     Add-ons / Opera Add-ons submission copy, screenshots, privacy
     disclosures (all stores require an explicit data-use declaration -
     "no data collected" across the board).
 
-## 8. Local-first development, then transition to a public GitHub repo
+## 8. Release process
 
-**Phase 1 - Local only (now).** All work happens in this local git
-repository (`darkModeExt2026`, not yet pushed anywhere). This lets the MVP,
-build tooling, and icon/UI polish get to a solid, working state privately,
-without half-finished code, placeholder copy, or embarrassing early commits
-being visible to the public before the project is ready.
+Development started in a local-only git repository so the MVP, build
+tooling, and icon/UI polish could reach a solid state before anything was
+public. The pre-publish cleanup is done: dev-only cruft and secrets/PII
+scan (no tracked machine-specific paths or tokens), `.gitignore` coverage
+(`dist/`, `node_modules/`, `web-ext-artifacts/`), public hygiene files
+(`LICENSE` (MIT), `README.md`, `PRIVACY.md`, `CONTRIBUTING.md`,
+`CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`), and branding
+consistency. History was squashed to a single initial commit and merged to
+`main`.
 
-**Phase 2 - Pre-publish cleanup.** Before creating/pushing to the public
-GitHub repo, do a deliberate cleanup pass so the public history starts
-clean and professional:
-- ⏳ **Decide on history strategy**: either squash the local history into a
-  single well-written initial commit ("Initial release of Tenebra vX.Y"),
-  or curate/rebase into a small number of clean, logically-grouped commits.
-  Default recommendation: squash to one clean initial commit - simplest,
-  avoids exposing exploratory/messy intermediate commits. **Not yet
-  decided** - needs an explicit call before Phase 3 (the actual push),
-  since it's a destructive/irreversible-feeling operation on local
-  history worth confirming deliberately rather than deciding inline.
-- ✅ **Remove dev-only cruft**: scratch notes, temp files reviewed - none
-  found tracked in git (temporary automation/debug files created during
-  the Chrome extension-loading investigation were cleaned up as part of
-  that work, never committed). `PLAN.md` reviewed and kept as-is (factual/transparent, not overly informal).
-- ✅ **Secrets/PII scan** (2026-09-29): grepped all tracked files for
-  machine-specific absolute paths (e.g. `E:\GitReposSSD`,
-  `C:\Users\...`) and common secret/API-key/token patterns - no matches.
-- ✅ **Verify `.gitignore` coverage** (2026-09-29): confirmed `dist/`,
-  `node_modules/`, `web-ext-artifacts/` are gitignored and `git status`
-  stays clean after a full `npm ci` + build + package cycle - nothing
-  generated is tracked.
-- ✅ **Add public-facing project hygiene files**: `LICENSE`, `README.md`,
-  `PRIVACY.md` already existed; added `CONTRIBUTING.md`,
-  `CODE_OF_CONDUCT.md` (Contributor Covenant v2.1), `SECURITY.md`
-  (private reporting via GitHub Security Advisories), and
-  `CHANGELOG.md` (2026-09-29).
-- ✅ **Finalize the open-source license**: MIT confirmed and already in
-  place (`LICENSE`).
-- ✅ **Confirm branding consistency**: package name, manifest `name` fields,
-  README title, icon, and store-copy language should already be finalized
-  and consistent by this point.
-- **Tag a version** (e.g. `v0.1.0`) at the clean commit that becomes the
-  public starting point.
+Going forward, feature work happens directly on the public repo via PRs.
+Repo topics: `dark-mode`, `firefox-extension`, `chrome-extension`,
+`browser-extension`, `privacy`. Optionally announce (r/firefox, r/chrome,
+Show HN) once a store listing is live - real installability matters more
+than a bare repo for adoption.
 
-**Phase 3 - Publish.**
-- Create the new public GitHub repository (e.g. `tenebra` or
-  `tenebra-extension` if the plain name is taken - check availability
-  before publishing).
-- Push the cleaned-up history/tag.
-- Set repo topics (`dark-mode`, `firefox-extension`, `chrome-extension`,
-  `browser-extension`, `privacy`), a short description, and enable Issues
-  for community feedback.
-- Add the GitHub Actions CI workflow (Section 6/7) so it runs publicly on
-  PRs from day one, signaling active maintenance to prospective
-  contributors/users.
-- Optionally announce on relevant communities (r/firefox, r/chrome,
-  Hacker News "Show HN," etc.) once the listing is live on at least one
-  store - real installability matters more than a bare repo for adoption.
+## 9. Open questions for later
 
-**Ongoing after publish**: continue normal feature work directly on the
-public repo via PRs; the "local-only" phase does not repeat for future
-features - it was specifically to give v1 a clean, presentable starting
-point.
-
-## 9. Open questions for later (not blocking repo init)
-
-- Minimum browser versions to support (affects whether we can rely on
-  newer CSS like `color-scheme` unconditionally - broadly supported, so
-  likely fine).
 - Whether `storage.sync` opt-in ships in v1 or v1.1.
-- Exact GitHub repo name (`tenebra` vs. `tenebra-extension`) - decide at
-  Phase 3, pending availability check.
-- Squash-to-one-commit vs. curated multi-commit history for the public
-  initial push - leaning squash, final call at Phase 2.
 
-## 10. Current implementation status (progress log)
+## 10. Implementation status & lessons learned
 
-The MVP (Sections 5–7, milestones 1–7 above) is implemented and working in
-both Firefox and Chrome, after several rounds of real-device debugging.
-Summary of what's been built and fixed, in order:
+The MVP (Sections 5-7, milestones 1-8 above) is implemented and working in
+both Firefox and Chrome after several rounds of real-device debugging.
 
-- **Scaffolding & MVP**: manifest split (base/firefox/chrome), background
-  script, content script, popup with per-site 3-way toggle (Always/Never/
-  Default) + global default toggle, options page, `storage.js` shim,
-  `build.js`, unit tests, ESLint config, `web-ext lint` clean.
-- **Firefox `importScripts` crash**: fixed an MV3 service-worker-only API
-  call that isn't valid in Firefox's background page model.
-- **Dark-mode CSS strategy**: went through two earlier approaches before
-  landing on the current one:
-  - *Full-page `filter: invert()`* - tried first, reverted: behaved
-    inconsistently between Chrome/Firefox and broke sites like LinkedIn.
-  - *CSS Cascade Layers (`@layer`)* - tried to explain a Firefox-only
-    dark-gray-text bug, reverted: didn't fix Firefox and
-    regressed a case that had been working in Chrome. Layer registration
-    order turned out not to be reliably controllable from a content
-    script at `document_start`.
-  - **Current approach**: a plain, unlayered stylesheet
-    (`dark-theme.css`) using an ID-specificity trick
-    (`:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id)`) so a
-    near-universal selector still outranks a site's own class-based
-    `!important` rules, combined with `!important`, so it is hardened
-    against high-specificity site CSS.
-- **Debug panel**: added a toggle in the popup (dev-only) that shows the
-  content script's live state (`siteMode`, `globalDefault`,
-  `resolvedEnabled`, `pageLooksAlreadyDark`, `fallbackStylesheetActive`,
-  `siteOverrideApplied`) for the active tab - this became the key
-  diagnostic tool for every bug below, replacing guesswork with direct
-  evidence.
-- **Chrome mode-toggle not updating without a refresh**: root-caused to
-  Chrome not reliably re-invalidating styles when a near-universal-selector
-  `<link>` stylesheet is toggled via `.disabled`, while Firefox does. Fixed
-  by fully removing/re-adding the `<link>` element instead of disabling it.
-- **Debug panel stale on toggle**: fixed by re-querying content-script
-  state shortly after a storage write instead of immediately (storage
-  change propagation + the content script's own re-apply is async).
-- **dark-gray-on-dark text (two rounds)**:
-  1. First root cause: the "already looks dark" heuristic
-     (`pageLooksAlreadyDark`) only checked `<html>`/`<body>` background
-     color - if it was dark, we skipped our fallback stylesheet entirely,
-     even though the site's own component text colors were never tuned
-     for that dark background (an inline styled-components `<h2>` at
-     `rgb(42,43,45)` on a near-black background). Fixed by adding a
-     WCAG-style contrast-ratio check (`heuristics.js`) that samples real
-     text nodes and only trusts the page's own dark theme if most sampled
-     text is actually readable against its effective background;
-     otherwise the fallback still applies.
-  2. Second root cause (contrast fix alone didn't work): `isDarkColor`
-     and `contrastRatio` ignored the alpha channel, so
-     `getComputedStyle`'s common initial value `rgba(0, 0, 0, 0)` (any
-     element with no explicit `background-color` rule - the norm on
-     plain light sites) was misread as **opaque black**, wrongly
-     confirming a "dark" background on ordinary light pages. Fixed by
-     treating near-zero-alpha colors as "no signal" rather than black,
-     in both `isDarkColor` and `contrastRatio`, plus the ancestor-walk in
-     `getEffectiveBackgroundColor`. Confirmed by the user to have fixed
-     other previously-misclassified light sites, without
-     apparent regressions on genuinely dark-themed sites tested so far.
-- **Net result**: the current heuristic (`pageLooksAlreadyDark` +
-  `pageHasReadableDarkText` in `content.js`, plus the color/contrast math
-  in `heuristics.js`) is now working correctly on every site tested to
-  date, but getting there took three separate bug-fix rounds across two
-  sessions - see Section 11 for the resulting open question about whether
-  to keep it.
+**Built:** manifest split (base/firefox/chrome), background script, content
+script, popup with per-site 3-way toggle (Always/Never/Default) + global
+default, options page, `storage.js` shim, `build.js`, unit tests, ESLint
+config, clean `web-ext lint`, and a dev-only popup debug panel showing the
+content script's live state (`siteMode`, `globalDefault`,
+`resolvedEnabled`, `pageLooksAlreadyDark`, `fallbackStylesheetActive`,
+`siteOverrideApplied`).
+
+**Current CSS approach:** a plain, unlayered stylesheet (`dark-theme.css`)
+using an ID-specificity trick
+(`:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id)`) plus
+`!important`, so a near-universal selector outranks a site's own
+class-based `!important` rules.
+
+**Lessons learned:**
+- Don't use CSS Cascade Layers (`@layer`): layer registration order is not
+  reliably controllable from a content script at `document_start`; it
+  fixed nothing in Firefox and regressed Chrome.
+- Don't use full-page `filter: invert()`: inconsistent between
+  Chrome/Firefox and breaks sites like LinkedIn.
+- To disable the stylesheet, remove the `<link>` element and re-add it to
+  enable; toggling `.disabled` doesn't reliably re-invalidate styles in
+  Chrome (Firefox does).
+- Query content-script state shortly after a storage write, not
+  immediately - propagation and the content script's re-apply are async.
+- Don't call `importScripts` in the background script: it is
+  service-worker-only and invalid in Firefox's background page model.
+- Chrome 152 blocks `--load-extension`, so Chrome testing is manual
+  (load unpacked from `dist/chrome`).
+- Colors with alpha below 0.05 mean "no color", not opaque black:
+  `getComputedStyle`'s default `rgba(0, 0, 0, 0)` was misread as black and
+  made ordinary light pages look dark. `isDarkColor`, `contrastRatio` and
+  the ancestor walk in `getEffectiveBackgroundColor` all handle this.
+- The "already looks dark" check must verify readable text contrast
+  (WCAG-style sampling of real text nodes in `heuristics.js`), not only
+  the `<html>`/`<body>` background; a dark page can still carry
+  dark-on-dark component text.
+- Confirm the diagnosis with DevTools or the debug panel before fixing;
+  this would have avoided the `@layer` detour.
 
 ## 11. Ideas / things to consider
 
-Open design questions raised during implementation, deliberately not yet
-decided - recorded here so the reasoning isn't lost, to revisit later.
+### 11.1 "Already looks dark" heuristic (decided: keep)
 
-### 11.1 Keep vs. remove the "already looks dark" heuristic
-
-The heuristic (`pageLooksAlreadyDark`/`pageHasReadableDarkText` in
-`content.js`) exists to avoid double-darkening sites that already ship a
-good dark theme - something Nightfoxify never attempted (it always applied its override
-unconditionally, sometimes replacing a site's own dark theme with a worse
-generic one).
-
-**Reasons to keep it:**
-- It does what it's meant to do: verified working on other
-  sites after the alpha-channel fix, without observed regressions so far.
-- Preserves a genuinely nicer outcome on well-designed dark sites (their
-  own theme, not our generic override) - a real user-visible quality
-  difference.
-- The specificity-trick CSS underneath it is solid and low-risk on its
-  own; the heuristic is a separate, optional layer on top of it.
-
-**Reasons to remove it (revert to an always-apply model):**
-- It has been the direct or indirect cause of **every** major bug fixed
-  so far this session (the `@layer` detour, the Chrome regression it
-  caused, and the two-round contrast/alpha bug) - a
-  disproportionate amount of debugging time for one feature.
-- It structurally *requires* deferring the fallback stylesheet until
-  `DOMContentLoaded` (needs real text + layout to sample), which is the
-  direct cause of the FOUC (flash of unstyled content) discussion in
-  11.2 below - removing the heuristic would let the fallback stylesheet
-  attach synchronously at `document_start` instead, solving most of FOUC
-  as a side effect rather than needing a separate mitigation.
-- Every new signal added to the heuristic (background color, then text
-  contrast, then alpha-awareness) has needed its own edge-case fixes;
-  it's plausible more remain (untested: pages using `currentColor`,
-  CSS custom properties resolved differently across engines, shadow DOM
-  content, iframes, canvas-rendered text, etc.).
-- Simpler code (~150+ fewer lines across `content.js`/`heuristics.js`)
-  is easier to reason about and maintain, which matters for a project
-  explicitly positioned as "minimal and fast."
-
-**Status:** ✅ **Decided (2026-09-29): keep the heuristic.** It is
-working correctly on every site tested so far (including the
-site that drove the most recent fix round), and preserving native dark
-themes is considered worth the added complexity. Not being revisited
-unless the wider manual test matrix (milestone 9) surfaces a new,
-unfixable-in-place failure mode.
+`pageLooksAlreadyDark`/`pageHasReadableDarkText` (`content.js`) plus the
+color/contrast math in `heuristics.js` avoid double-darkening sites that
+ship a good dark theme. It cost several bug-fix rounds (Section 10), and
+it requires deferring the fallback stylesheet until `DOMContentLoaded`
+(needs real text and layout), which is the cause of the FOUC window in
+11.2. Decision: keep it - it preserves native dark themes and works on
+every site tested. Revisit only if the wider manual test matrix
+(milestone 9) surfaces an unfixable-in-place failure mode; removing it
+would let the stylesheet attach synchronously at `document_start` and
+solve most of FOUC. Untested edge cases: `currentColor`, CSS custom
+properties, shadow DOM, iframes, canvas-rendered text.
 
 ### 11.2 Flash of unstyled content (FOUC) shield at page load
 
@@ -441,8 +333,7 @@ over (light page).
   shield mechanism at all.
 
 **Status:** deferred, not decided - kept here as an idea for later, not
-implemented now (2026-09-29: the user opted to keep the heuristic as-is
-per 11.1, and explicitly chose not to implement a FOUC shield at this
-time). Revisit if FOUC turns out to be a real user-facing complaint once
+implemented now (the heuristic is kept per 11.1, and a FOUC shield was
+explicitly not implemented). Revisit if FOUC turns out to be a real user-facing complaint once
 the wider manual test matrix (milestone 9) is complete; the coupling to
 11.1 above still holds if that heuristic decision is ever revisited.
