@@ -1,0 +1,97 @@
+/**
+ * Tenebra fallback dark stylesheet.
+ *
+ * General, selector-based override - the same strategy as the original
+ * Nightfoxify extension (force dark backgrounds + light text broadly),
+ * refined to actually hold up on complex sites:
+ *
+ * 1. Every element gets the *same* solid dark background + light text,
+ *    rather than being left transparent. Leaving backgrounds transparent
+ *    would make modals/dropdowns/tooltips see-through (they need their
+ *    own opaque surface); painting everything the same flat dark color
+ *    instead makes nested containers visually indistinguishable from
+ *    each other, which is what you want for a generic override.
+ * 2. Selectors use a specificity trick: `:not(#tenebra-nonexistent-id)`
+ *    matches virtually every element (no real page has that id) while
+ *    contributing the specificity of an ID selector. Per the CSS cascade,
+ *    any selector with an ID component beats any selector built only from
+ *    classes/attributes/tags, regardless of source order or how many
+ *    classes it has. That's why the plain, hand-tuned selector lists in
+ *    the original Nightfoxify CSS (`div, p, table, ul, ytd-browse, ...`)
+ *    broke on complex apps: those apps' own component CSS (class-based,
+ *    often also `!important`) has *equal or higher* specificity and can
+ *    still win. Combined with `!important`, this generic rule reliably
+ *    beats a site's own `!important` class rules without maintaining a
+ *    per-site selector list. (`filter: invert()` was tried and reverted -
+ *    it creates a new containing block for `position: fixed`/`sticky`
+ *    descendants, breaking layouts on apps that rely on those, and
+ *    differently across Firefox/Chromium.)
+ * 3. Media (img/video/svg/canvas/iframe/...) and elements that show an
+ *    image via CSS `background-image` (tagged `.tenebra-bg-image-el` by
+ *    content.js) are excluded from the solid background so photos/video
+ *    stay visible.
+ * 4. Remaining site-specific breakage (rare - e.g. a page using an ID
+ *    selector or an inline `!important` style) is handled per-site in
+ *    site-overrides.js rather than by growing this generic rule.
+ *
+ * Note: an earlier revision wrapped all of this in `@layer tenebra { }`,
+ * theorizing that CSS Cascade Layers' priority-reversal for `!important`
+ * declarations explained a Firefox-only rendering bug. That wrapping was
+ * reverted: it didn't fix the Firefox issue, and it broke a case that
+ * had been working correctly in Chrome (see git history) - most likely
+ * because a page's own layer(s) can end up registered before ours
+ * depending on exact script/parse timing, which isn't reliably
+ * controllable from a content script. Layers are not used here.
+ */
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: #16171a !important;
+}
+
+:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id) {
+  background-color: #16171a !important;
+  color: #d7d7d7 !important;
+  border-color: #3a3d42 !important;
+  box-shadow: none !important;
+}
+
+a:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+a:visited:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id) {
+  color: #8ab4f8 !important;
+}
+
+input:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+textarea:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+select:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+button:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id) {
+  background-color: #232427 !important;
+  color: #d7d7d7 !important;
+  border-color: #4a4d52 !important;
+}
+
+::placeholder {
+  color: #8a8a8a !important;
+  opacity: 1 !important;
+}
+
+/* Leave media untouched so photos/video/canvas render normally. Written
+   as a plain, fully-expanded comma list (rather than :is(...)) so a
+   single unsupported selector can't cause the whole rule to be dropped
+   by a stricter/older CSS parser. */
+img:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+video:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+canvas:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+picture:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+svg:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+iframe:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+embed:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+object:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id),
+.tenebra-bg-image-el:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+

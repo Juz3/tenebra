@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tenebra - Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Tenebra</h1>
+
+      <section>
+        <h2>Default behavior</h2>
+        <label class="switch-row">
+          <span>Enable dark mode by default on new sites</span>
+          <input type="checkbox" id="global-toggle" />
+        </label>
+      </section>
+
+      <section>
+        <h2>Per-site overrides</h2>
+        <p class="hint">
+          Sites you've set to "Always" or "Never" from the popup appear here.
+        </p>
+        <table id="site-table">
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Mode</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="site-table-body"></tbody>
+        </table>
+        <p class="empty-state" id="empty-state" hidden>
+          No per-site overrides yet.
+        </p>
+      </section>
+
+      <section>
+        <h2>Privacy</h2>
+        <p class="hint">
+          Tenebra collects no data, makes no network requests, and includes
+          no analytics or third-party code. All preferences are stored
+          locally in your browser. See <code>PRIVACY.md</code> in the
+          project source for details.
+        </p>
+      </section>
+    </main>
+
+    <script src="../shared/storage.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

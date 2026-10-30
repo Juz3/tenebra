@@ -1,0 +1,23 @@
+{
+  "name": "tenebra",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fast, minimal dark mode for every site. Per-site control. Zero telemetry, zero network calls.",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build/build.js",
+    "build:firefox": "node build/build.js firefox",
+    "build:chrome": "node build/build.js chrome",
+    "generate-icons": "node build/generate-icons.js",
+    "lint": "eslint src build tests",
+    "lint:ext": "web-ext lint --source-dir=dist/firefox",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "package:firefox": "web-ext build --source-dir=dist/firefox --artifacts-dir=web-ext-artifacts --overwrite-dest",
+    "package:chrome": "node build/zip-chrome.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1",
+    "eslint": "^9.9.0",
+    "web-ext": "^10.7.0"
+  }
+}
