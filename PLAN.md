@@ -9,14 +9,6 @@ calls._
 
 - **Name: Tenebra** (from Latin *tenebrae*, "shadows/darkness"). Short,
   brand-able, not tied to any browser name, not "night mode."
-- Checked against Mozilla AMO (`addons.mozilla.org` search API) and the
-  Chrome Web Store for existing extensions named "dark mode," "night mode,"
-  and a shortlist of candidate brand names (Duskly, Nyx, Onyx, Noctura,
-  Tenebra, etc.). Notable collisions found and avoided:
-  - **Duskly** - already an existing Chrome dark-mode extension. Rejected.
-  - **Nyx** - already an existing Chrome dark-mode extension. Rejected.
-  - **Onyx** - partial collisions (Onyx Notes, Onyx Theme). Rejected.
-  - **Tenebra** - no exact collisions found on either store. Selected.
 - **Discoverability strategy** (since the brand name doesn't literally say
   "dark mode"): both stores index listing text, not just the title.
   - Store title: `Tenebra - Dark Mode for Every Site`
@@ -30,31 +22,18 @@ calls._
   no busy iconography) reflecting the "minimal & fast" positioning. Icon
   design is a later milestone (Section 7).
 
-## 2. Lessons from Nightfoxify (prior extension)
+## 2. Background
 
-Keep:
-- Zero dependencies, zero network calls, zero telemetry - this was already
-  true and is a core selling point to preserve exactly.
-- Extremely small footprint / simple mental model (toggle dark mode on/off).
+Tenebra supersedes Nightfoxify, an older Firefox dark mode extension by the
+author. Design choices that follow from that history:
 
-Fix / modernize:
-- Manifest V2 → **Manifest V3** (MV2 is being sunset in Chrome already, and
-  Firefox is moving that direction too).
-- Blunt hardcoded CSS override (`div, p, table, ul, ytd-browse { ... }`) →
-  smarter, generic dark-mode strategy that doesn't double-darken sites that
-  already ship their own dark theme, and doesn't rely on hand-tuned,
-  site-specific selectors.
-- Global-only on/off → **per-site state** (on / off / auto), remembered
-  per-hostname.
-- Icon-only toolbar button → small popup with current-site toggle, still
-  100% local/static, no remote assets.
-- No build tooling → minimal Node-based build script (no framework, no
-  bundler needed given the small surface) that emits separate
-  Firefox and Chrome packages from **one shared source tree**.
-- No CI → GitHub Actions for lint + package build on push/PR.
-- Duplicate/divergent Firefox vs Chrome branches (`nightfoxify` vs
-  `nightfoxify_chrome`, hand-copy-pasted) → **single unified codebase**,
-  browser differences isolated to a small manifest-merge step.
+- Zero dependencies, zero network calls, zero telemetry, and a tiny footprint
+  are preserved as core selling points.
+- **Manifest V3** (MV2 is being sunset).
+- **Per-site state** (on / off / auto), remembered per hostname, instead of a
+  global-only toggle.
+- **Single unified codebase** for Firefox and Chrome, with browser differences
+  isolated to a small manifest-merge step.
 
 ## 3. Core design principles
 
@@ -104,7 +83,7 @@ Fix / modernize:
 
 ## 5. Feature set
 
-### v1 (MVP - parity+ with Nightfoxify, modernized)
+### v1 (MVP - modernized, per-site aware)
 - Global toggle: dark mode on/off, toolbar button + popup.
 - Per-site override: "Always," "Never," "Use global default" - stored in
   `storage.local`, keyed by hostname.
@@ -133,7 +112,7 @@ Fix / modernize:
 ### Explicitly out of scope
 - No cloud accounts, no update-ping telemetry, no crash reporting SDKs, no
   ads, no "Pro" tier / paywall, no bundled unrelated features (VPN, ad
-  blocking, etc.) - scope creep that the analysis flagged as a risk to
+  blocking, etc.) - scope creep that was flagged as a risk to
   avoid repeating.
 
 ## 6. Technical architecture
@@ -169,7 +148,7 @@ tenebra/
 ├── package.json                 # dev-only deps: eslint, prettier, web-ext, a test runner
 ├── PRIVACY.md                   # explicit no-telemetry / no-network statement
 ├── CHANGELOG.md
-├── LICENSE                      # MIT (carried over from Nightfoxify)
+├── LICENSE                      # MIT
 └── README.md
 ```
 
@@ -182,8 +161,7 @@ tenebra/
   - Firefox MV3: `background.scripts` (event page) + `browser_specific_settings.gecko`.
   - Chrome MV3: `background.service_worker`.
   - `content_scripts` shared (`matches: ["http://*/*", "https://*/*"]`,
-    excluding `file://` unlike the original, which had none of these
-    exclusions).
+    excluding `file://`).
 - **Build step is intentionally simple:** no Webpack/Rollup/Vite needed for
   a project this small - a ~50-line Node script that copies files and
   merges JSON is enough, keeps "minimal and fast" true for contributors
@@ -193,7 +171,7 @@ tenebra/
 
 ## 7. Milestones
 
-1. ✅ Analyze Nightfoxify (done - see analysis doc).
+1. ✅ Review prior extension and define scope (done).
 2. ✅ Decide branding/name (Tenebra).
 3. ✅ **Initialize repo & scaffolding**: folder structure, package.json,
    base manifest split, LICENSE, README, PRIVACY.md, .gitignore.
@@ -329,9 +307,8 @@ Summary of what's been built and fixed, in order:
     (`dark-theme.css`) using an ID-specificity trick
     (`:not(#tenebra-nonexistent-id):not(#tenebra-nonexistent-id)`) so a
     near-universal selector still outranks a site's own class-based
-    `!important` rules, combined with `!important`. Directionally the
-    same idea as the original Nightfoxify (plain selectors + `!important`)
-    but hardened against high-specificity site CSS.
+    `!important` rules, combined with `!important`, so it is hardened
+    against high-specificity site CSS.
 - **Debug panel**: added a toggle in the popup (dev-only) that shows the
   content script's live state (`siteMode`, `globalDefault`,
   `resolvedEnabled`, `pageLooksAlreadyDark`, `fallbackStylesheetActive`,
@@ -383,9 +360,8 @@ decided - recorded here so the reasoning isn't lost, to revisit later.
 
 The heuristic (`pageLooksAlreadyDark`/`pageHasReadableDarkText` in
 `content.js`) exists to avoid double-darkening sites that already ship a
-good dark theme - something the original Nightfoxify never attempted (it
-always applied its override unconditionally, accepting that it would
-sometimes replace a site's own dark theme with its own, generally worse,
+good dark theme - something Nightfoxify never attempted (it always applied its override
+unconditionally, sometimes replacing a site's own dark theme with a worse
 generic one).
 
 **Reasons to keep it:**
@@ -393,11 +369,11 @@ generic one).
   sites after the alpha-channel fix, without observed regressions so far.
 - Preserves a genuinely nicer outcome on well-designed dark sites (their
   own theme, not our generic override) - a real user-visible quality
-  difference from Nightfoxify.
+  difference.
 - The specificity-trick CSS underneath it is solid and low-risk on its
   own; the heuristic is a separate, optional layer on top of it.
 
-**Reasons to remove it (revert to Nightfoxify's always-apply model):**
+**Reasons to remove it (revert to an always-apply model):**
 - It has been the direct or indirect cause of **every** major bug fixed
   so far this session (the `@layer` detour, the Chrome regression it
   caused, and the two-round contrast/alpha bug) - a
