@@ -19,3 +19,7 @@ If a future version adds an *optional* feature (e.g. `storage.sync` for
 cross-device preference sync), it will use the browser's own built-in
 sync mechanism, will be strictly opt-in, and this document will be
 updated to describe exactly what that entails before it ships.
+
+## Extension detection
+
+Tenebra exposes its dark-theme stylesheet to web pages (required to apply dark mode), so a page could in principle detect that Tenebra is installed. This reveals nothing beyond installation. Mitigations: Firefox uses a random per-profile extension UUID, and the Chrome build uses `use_dynamic_url` so the resource URL changes per session instead of using the fixed extension ID.
