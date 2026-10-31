@@ -11,6 +11,15 @@ Pre-release development. Nothing has been published to AMO or the
 Chrome Web Store yet - see [PLAN.md](./PLAN.md) for the full roadmap and
 current status.
 
+### Security
+- Residual risk: `content/dark-theme.css` is web-accessible on http(s)
+  pages, so a page can probe for it to detect that Tenebra is installed.
+  Mitigations: Firefox randomises the extension UUID per profile; the
+  Chrome build sets `use_dynamic_url` so the resource URL is
+  per-session rather than fixed to the extension ID.
+- CI: least-privilege `permissions: contents: read`, GitHub Actions
+  pinned to commit SHAs, and weekly Dependabot updates for them.
+
 ### Added
 - Manifest V3 extension scaffold for Firefox and Chrome from a single
   shared source tree (`src/`), with a small Node build script
